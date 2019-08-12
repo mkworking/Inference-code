@@ -1,0 +1,66 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from sklearn.model_selection import train_test_split
+%matplotlib notebook
+## 实际函数为 y = 25 * x + 10; 随机误差分布为 mean=0,sd**2=10的正态分布
+x = np.arange(0,20,0.5)  
+y = 5 * x + 10 + np.random.normal(0,10,len(x))
+## 将数据拆分成训练集和测试集
+x_train,x_test,y_train,y_test = train_test_split(x, y, test_size = 0.3, random_state = 0)
+
+## 定义w,b的梯度
+def grad_w(w,b):
+    tmp = (f_x(w,b,x_train) - y_train)*x_train
+    tmp = sum(tmp)/len(tmp)
+    return tmp
+def grad_b(w,b):
+    tmp = f_x(w,b,x_train) - y_train
+    tmp = sum(tmp)/len(tmp)
+    return tmp
+
+## 定义模型函数
+def f_x(w,b,x):
+    return w * x + b
+## 参数初始化
+def parameter_init():
+    w = 0
+    b = 0
+    learning_rate = 0.001
+    return w,b,learning_rate
+## 初始化系数
+w,b,learning_rate = parameter_init()
+## 记录迭代的数据,以便绘制动态图(损失函数和模型);
+parameters = [] ## 记录迭代的w,b系数
+loss = []       ## 记录迭代的损失函数
+n = 30          ## 迭代次数 
+for i in range(n):
+    w -= learning_rate * grad_w(w,b)
+    b -= learning_rate * grad_b(w,b)
+    parameters.append((w,b))
+    tmp_loss = ((y_train - f_x(w,b,x_train)) ** 2)/(len(y_train) * 2)
+    loss.append(tmp_loss.sum()) 
+
+## 模型更新动态图和损失函数动态图
+fig = plt.figure()
+ax = plt.subplot(121)
+ax.scatter(x_train, y_train)
+line, = ax.plot(x_train, parameters[0][0] * x_train +parameters[0][1], 'r-', linewidth=2)
+## Loss更新图
+ax1 = plt.subplot(122) 
+plt.plot(loss)
+point = ax1.scatter(0,loss[0],c = 'red')
+# 模型线更新
+def update(i):
+    line.set_ydata(parameters[i][0] * x_train +parameters[i][1])
+    return line
+## 模型Loss更新图
+def loss_update(i):
+    point.set_offsets(np.array([i,loss[i]]))
+    return point
+if __name__ == '__main__':
+ # 会为每一帧调用Update函数
+ # 这里FunAnimation设置一个10帧动画，每帧间隔200ms
+    anim = FuncAnimation(fig, update, frames=n, interval=200)
+    loss_anim = FuncAnimation(fig, loss_update, frames=n, interval=200)
+    plt.show()
