@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from sklearn.model_selection import train_test_split
 %matplotlib notebook
-## 实际函数为 y = 25 * x + 10; 随机误差分布为 mean=0,sd**2=10的正态分布
+## 实际函数为 y = 5 * x + 10; 随机误差分布为 mean=0,sd**2=10的正态分布
 x = np.arange(0,20,0.5)  
 y = 5 * x + 10 + np.random.normal(0,10,len(x))
 ## 将数据拆分成训练集和测试集
